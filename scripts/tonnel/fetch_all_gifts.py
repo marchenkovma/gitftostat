@@ -7,6 +7,7 @@ from typing import List, Dict, Set, Optional
 from config.database import Database
 from config.config import DB_CONFIG
 from config.logger import logger
+from datetime import datetime
 
 class Tonnel:
     def __init__(self, test_mode: bool = False, test_pages: int = 2):
@@ -15,6 +16,7 @@ class Tonnel:
         self.processed_gifts: Set[str] = set()
         self.test_mode = test_mode
         self.test_pages = test_pages
+        self.start_time = time.time()
         logger.info("Tonnel client initialized")
 
     def fetch_page(self, page: int, limit: int = 30) -> List[Dict]:
@@ -34,7 +36,6 @@ class Tonnel:
         }
 
         try:
-            logger.debug(f"Fetching page {page} with limit {limit}")
             response = requests.post(
                 f'{self.base_url}/pageGifts',
                 json=json_data,
@@ -59,7 +60,6 @@ class Tonnel:
             if gift_key not in self.processed_gifts:
                 self.processed_gifts.add(gift_key)
                 self.db.save_unique_gift(name, model)
-                logger.info(f"Processed new gift: {name} ({model})")
 
     def fetch_all_gifts(self) -> None:
         if not self.db.connect():
@@ -89,8 +89,6 @@ class Tonnel:
                     for gift in gifts:
                         self.process_gift(gift)
 
-                logger.info(f"Processed page {page}, total unique gifts: {len(self.processed_gifts)}")
-                
                 if len(gifts) < 30:
                     logger.info("Reached end of gift list")
                     break
@@ -102,7 +100,9 @@ class Tonnel:
             logger.error(f"Error processing page {page}: {e}")
         finally:
             self.db.close()
+            execution_time = time.time() - self.start_time
             logger.info(f"Gift fetching completed. Total unique gifts: {len(self.processed_gifts)}")
+            logger.info(f"Execution time: {execution_time:.2f} seconds")
 
 def main():
     import argparse
@@ -111,8 +111,11 @@ def main():
     parser.add_argument('--pages', type=int, default=2, help='Number of pages to process in test mode')
     args = parser.parse_args()
 
+    start_time = time.time()
     tonnel = Tonnel(test_mode=args.test, test_pages=args.pages)
     tonnel.fetch_all_gifts()
+    total_time = time.time() - start_time
+    logger.info(f"Total script execution time: {total_time:.2f} seconds")
 
 if __name__ == "__main__":
     main() 

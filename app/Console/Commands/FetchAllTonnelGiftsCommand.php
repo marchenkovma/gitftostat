@@ -31,9 +31,15 @@ class FetchAllTonnelGiftsCommand extends Command
 
         $process = new Process($command);
 
-        // Устанавливаем только уровень логирования
+        // Устанавливаем переменные окружения
         $process->setEnv([
-            'TONNEL_LOG_LEVEL' => 'INFO'
+            'TONNEL_LOG_LEVEL' => 'INFO',
+            'TONNEL_LOG_FILE' => storage_path('logs/tonnel.log'),
+            'DB_HOST' => config('database.connections.pgsql.host'),
+            'DB_PORT' => config('database.connections.pgsql.port'),
+            'DB_DATABASE' => config('database.connections.pgsql.database'),
+            'DB_USERNAME' => config('database.connections.pgsql.username'),
+            'DB_PASSWORD' => config('database.connections.pgsql.password'),
         ]);
 
         $process->setTimeout(null);

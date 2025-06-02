@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Запоминаем время начала выполнения
+START_TIME=$(date +%s)
+
 # Путь к виртуальному окружению
 VENV_PATH="$(dirname "$0")/venv"
 
@@ -27,4 +30,10 @@ fi
 export PYTHONPATH="$(dirname "$0"):$PYTHONPATH"
 
 # Запускаем Python скрипт с переданными аргументами
-python3 "$(dirname "$0")/fetch_all_gifts.py" "$@" 
+python3 "$(dirname "$0")/fetch_all_gifts.py" "$@"
+
+# Записываем время выполнения
+END_TIME=$(date +%s)
+EXECUTION_TIME=$((END_TIME - START_TIME))
+LOG_FILE="${TONNEL_LOG_FILE:-storage/logs/tonnel.log}"
+echo "[$(date '+%Y-%m-%d %H:%M:%S')] INFO: Total execution time: ${EXECUTION_TIME} seconds" >> "$LOG_FILE" 
