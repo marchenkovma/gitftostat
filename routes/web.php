@@ -4,8 +4,7 @@ use App\Http\Controllers\GiftController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return 'Hello World';
+    return view('welcome');
 });
 
-Route::get('/gifts', [GiftController::class, 'index'])->name('gifts.index');
-Route::get('/gifts/{gift}', [GiftController::class, 'show'])->name('gifts.show');
+Route::resource('gifts', GiftController::class);

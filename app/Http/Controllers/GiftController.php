@@ -7,33 +7,17 @@ use Illuminate\Http\Request;
 
 class GiftController extends Controller
 {
-    /**
-     * Display a listing of the gifts.
-     */
-    public function index(Request $request)
+    public function index()
     {
-        $query = Gift::query();
-
-        // Поиск по названию
-        if ($request->has('search')) {
-            $query->where('name', 'like', '%' . $request->search . '%');
-        }
-
-        // Сортировка по цене
-        if ($request->has('price')) {
-            $query->orderBy('price', $request->price);
-        }
-
-        $gifts = $query->paginate(12);
+        $gifts = Gift::orderBy('created_at', 'desc')
+            ->paginate(20);
 
         return view('gifts.index', compact('gifts'));
     }
 
-    /**
-     * Display the specified gift.
-     */
     public function show(Gift $gift)
     {
+        $gift->load('prices');
         return view('gifts.show', compact('gift'));
     }
 } 
