@@ -60,6 +60,7 @@ class Tonnel:
             if gift_key not in self.processed_gifts:
                 self.processed_gifts.add(gift_key)
                 self.db.save_unique_gift(name, model)
+                logger.info(f"Processed new gift: {name} ({model})")
 
     def fetch_all_gifts(self) -> None:
         if not self.db.connect():
@@ -88,6 +89,8 @@ class Tonnel:
                     empty_responses = 0
                     for gift in gifts:
                         self.process_gift(gift)
+
+                logger.info(f"Processed page {page}, total unique gifts: {len(self.processed_gifts)}")
 
                 if len(gifts) < 30:
                     logger.info("Reached end of gift list")

@@ -25,8 +25,23 @@ class LaravelFormatter(logging.Formatter):
     
     def format(self, record):
         # Форматируем сообщение в стиле Laravel
-        record.msg = f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] {record.levelname}: {record.msg}"
-        return super().format(record)
+        timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        return f"[{timestamp}] {record.levelname}: {record.getMessage()}"
+
+class FileFilter(logging.Filter):
+    """Фильтр для файла логов - пропускает только важные сообщения"""
+    
+    def filter(self, record):
+        # Пропускаем только сообщения уровня INFO и выше, исключая сообщения о подарках
+        if record.levelno >= logging.INFO:
+            message = record.getMessage()
+            # Исключаем сообщения о подарках и статистику по страницам
+            if not any([
+                "Processed new gift:" in message,
+                "Processed page" in message and "total unique gifts" in message
+            ]):
+                return True
+        return False
 
 def setup_logger(name: str, level: str = 'INFO', log_file: Optional[str] = None) -> logging.Logger:
     """Настройка логгера в стиле Laravel"""
@@ -38,17 +53,18 @@ def setup_logger(name: str, level: str = 'INFO', log_file: Optional[str] = None)
     logger.handlers = []
 
     # Создаем форматтер
-    formatter = LaravelFormatter('%(message)s')
+    formatter = LaravelFormatter()
 
-    # Добавляем обработчик для вывода в консоль
+    # Добавляем обработчик для вывода в консоль (все сообщения)
     console_handler = logging.StreamHandler(sys.stdout)
     console_handler.setFormatter(formatter)
     logger.addHandler(console_handler)
 
-    # Если указан файл для логов, добавляем файловый обработчик
+    # Если указан файл для логов, добавляем файловый обработчик (только важные сообщения)
     if log_file:
         file_handler = logging.FileHandler(log_file, mode='a', encoding='utf-8')
         file_handler.setFormatter(formatter)
+        file_handler.addFilter(FileFilter())  # Добавляем фильтр
         logger.addHandler(file_handler)
 
     return logger
