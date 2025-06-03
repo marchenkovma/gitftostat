@@ -37,7 +37,7 @@
                             <th class="px-6 py-3 border-b text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Название</th>
                             <th class="px-6 py-3 border-b text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Модель</th>
                             <th class="px-6 py-3 border-b text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Последняя цена</th>
-                            <th class="px-6 py-3 border-b text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Дата добавления</th>
+                            <th class="px-6 py-3 border-b text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Дата обновления</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-200">
@@ -53,7 +53,13 @@
                                         -
                                     @endif
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $gift->created_at->format('d.m.Y H:i') }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                    @if($gift->prices->isNotEmpty())
+                                        {{ \Carbon\Carbon::parse($gift->prices->last()->checked_at)->format('d.m.Y H:i') }}
+                                    @else
+                                        -
+                                    @endif
+                                </td>
                             </tr>
                         @empty
                             <tr>
