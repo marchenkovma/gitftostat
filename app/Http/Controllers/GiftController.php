@@ -9,7 +9,7 @@ class GiftController extends Controller
 {
     public function index()
     {
-        $gifts = Gift::orderBy('name', 'desc')
+        $gifts = Gift::orderBy('name', 'asc')
             ->paginate(20);
 
         return view('gifts.index', compact('gifts'));
