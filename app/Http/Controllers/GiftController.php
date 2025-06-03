@@ -10,7 +10,7 @@ class GiftController extends Controller
     public function index()
     {
         $gifts = Gift::orderBy('name', 'asc')
-            ->paginate(20);
+            ->paginate(100);
 
         return view('gifts.index', compact('gifts'));
     }
