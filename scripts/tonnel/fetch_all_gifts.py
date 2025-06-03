@@ -23,14 +23,8 @@ class Tonnel:
         json_data = {
             'page': page,
             'limit': limit,
-            'sort': json.dumps({'message_post_time': -1, 'gift_id': -1}),
-            'filter': json.dumps({
-                "price": {"$exists": True},
-                "refunded": {"$ne": True},
-                "buyer": {"$exists": False},
-                "export_at": {"$exists": True},
-                "asset": "TON"
-            }),
+            'sort': '',
+            'filter': '',
             'price_range': None,
             'user_auth': ''
         }

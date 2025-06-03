@@ -29,8 +29,14 @@ fi
 # Устанавливаем PYTHONPATH
 export PYTHONPATH="$(dirname "$0"):$PYTHONPATH"
 
-# Запускаем Python скрипт с переданными аргументами
-python3 "$(dirname "$0")/fetch_all_gifts.py" "$@"
+# Определяем, какой скрипт запускать
+if [ "$1" = "check_gift_price.py" ]; then
+    # Запускаем скрипт проверки цен
+    python3 "$(dirname "$0")/check_gift_price.py" "${@:2}"
+else
+    # Запускаем скрипт получения всех подарков
+    python3 "$(dirname "$0")/fetch_all_gifts.py" "$@"
+fi
 
 # Записываем время выполнения
 END_TIME=$(date +%s)

@@ -1,12 +1,3 @@
-import logging.config
-from .config import LOGGING
-
-# Настраиваем логирование
-logging.config.dictConfig(LOGGING)
-
-# Создаем логгер
-logger = logging.getLogger(__name__)
-
 import logging
 import sys
 from datetime import datetime
