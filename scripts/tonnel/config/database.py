@@ -69,7 +69,7 @@ class Database:
     def save_gift_price(self, gift_id: int, price: float) -> bool:
         """Сохранить цену подарка"""
         try:
-            now = datetime.utcnow()
+            now = datetime.now()
             self.cursor.execute(
                 """
                 INSERT INTO gift_prices (gift_id, price, checked_at, created_at, updated_at)
