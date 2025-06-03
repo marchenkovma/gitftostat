@@ -23,6 +23,11 @@ class Database:
                 password=os.getenv('DB_PASSWORD')
             )
             self.cursor = self.conn.cursor(cursor_factory=DictCursor)
+            
+            # Устанавливаем часовой пояс для сессии
+            self.cursor.execute("SET timezone = 'Europe/Moscow'")
+            self.conn.commit()
+            
             logger.info("Successfully connected to database")
             return True
         except Exception as e:

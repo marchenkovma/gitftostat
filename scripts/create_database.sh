@@ -38,6 +38,20 @@ EOF
 
 if [ $? -eq 0 ]; then
     echo "Database $DB_DATABASE created successfully!"
+    
+    # Устанавливаем часовой пояс для базы данных
+    echo "Setting timezone to Europe/Moscow..."
+    PGPASSWORD=$DB_PASSWORD psql -h $DB_HOST -p $DB_PORT -U $DB_USERNAME -d $DB_DATABASE << EOF
+ALTER DATABASE $DB_DATABASE SET timezone TO 'Europe/Moscow';
+EOF
+
+    if [ $? -eq 0 ]; then
+        echo "Timezone set successfully!"
+    else
+        echo "Error setting timezone"
+        exit 1
+    fi
+
     echo "Now you can run Laravel migrations to create tables."
 else
     echo "Error creating database"

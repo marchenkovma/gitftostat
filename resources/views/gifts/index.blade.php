@@ -55,7 +55,7 @@
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                     @if($gift->prices->isNotEmpty())
-                                        {{ \Carbon\Carbon::parse($gift->prices->last()->checked_at)->format('d.m.Y H:i') }}
+                                        {{ \Carbon\Carbon::parse($gift->prices->last()->checked_at)->setTimezone('Europe/Moscow')->format('d.m.Y H:i') }}
                                     @else
                                         -
                                     @endif
