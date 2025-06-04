@@ -7,6 +7,8 @@ from typing import Dict, Optional
 from config.database import Database
 from config.logger import logger
 from datetime import datetime
+import random
+import time
 
 class TonnelPriceChecker:
     def __init__(self):
@@ -34,6 +36,10 @@ class TonnelPriceChecker:
         }
 
         try:
+            # Добавляем рандомную задержку перед запросом
+            delay = random.uniform(1, 2)
+            time.sleep(delay)
+        
             response = requests.post(
                 f'{self.base_url}/pageGifts',
                 json=json_data,
