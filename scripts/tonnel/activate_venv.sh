@@ -9,21 +9,21 @@ VENV_PATH="$(dirname "$0")/venv"
 # Если виртуальное окружение не существует, создаем его
 if [ ! -d "$VENV_PATH" ]; then
     echo "Creating virtual environment..."
-    python3 -m venv "$VENV_PATH"
+    python3.11 -m venv "$VENV_PATH"
     source "$VENV_PATH/bin/activate"
     
     # Обновляем pip
-    pip3 install --upgrade pip
+    pip install --upgrade pip
     
     # Устанавливаем зависимости
     echo "Installing dependencies..."
-    pip3 install -r "$(dirname "$0")/requirements.txt"
+    pip install -r "$(dirname "$0")/requirements.txt"
 else
     source "$VENV_PATH/bin/activate"
     
     # Проверяем и обновляем зависимости
     echo "Updating dependencies..."
-    pip3 install -r "$(dirname "$0")/requirements.txt" --upgrade
+    pip install -r "$(dirname "$0")/requirements.txt" --upgrade
 fi
 
 # Устанавливаем PYTHONPATH
@@ -32,10 +32,13 @@ export PYTHONPATH="$(dirname "$0"):$PYTHONPATH"
 # Определяем, какой скрипт запускать
 if [ "$1" = "check_gift_price.py" ]; then
     # Запускаем скрипт проверки цен
-    python3 "$(dirname "$0")/check_gift_price.py" "${@:2}"
+    python "$(dirname "$0")/check_gift_price.py" "${@:2}"
+elif [ "$1" = "download_gift_images.py" ]; then
+    # Запускаем скрипт загрузки изображений
+    python "$(dirname "$0")/download_gift_images.py" "${@:2}"
 else
     # Запускаем скрипт получения всех подарков
-    python3 "$(dirname "$0")/fetch_all_gifts.py" "$@"
+    python "$(dirname "$0")/fetch_all_gifts.py" "$@"
 fi
 
 # Записываем время выполнения

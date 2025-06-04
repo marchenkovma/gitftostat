@@ -34,9 +34,10 @@
                     <thead>
                         <tr class="bg-gray-50">
                             <th class="px-6 py-3 border-b text-left text-xs font-medium text-gray-500 uppercase tracking-wider">№</th>
+                            <th class="px-6 py-3 border-b text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Изображение</th>
                             <th class="px-6 py-3 border-b text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Название</th>
                             <th class="px-6 py-3 border-b text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Модель</th>
-                            <th class="px-6 py-3 border-b text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Последняя цена</th>
+                            <th class="px-6 py-3 border-b text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Последняя floor цена</th>
                             <th class="px-6 py-3 border-b text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Дата обновления</th>
                         </tr>
                     </thead>
@@ -44,6 +45,13 @@
                         @forelse($gifts as $gift)
                             <tr>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ ($gifts->currentPage() - 1) * $gifts->perPage() + $loop->iteration }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-center">
+                                    <div class="flex justify-center">
+                                        <img src="{{ $gift->image ? asset('images/gifts/' . $gift->image) : asset('images/gifts/default.svg') }}" 
+                                             alt="{{ $gift->name }}" 
+                                             class="w-16">
+                                    </div>
+                                </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $gift->name }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $gift->model }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
@@ -63,7 +71,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="5" class="px-6 py-4 text-center text-sm text-gray-500">Подарков пока нет</td>
+                                <td colspan="6" class="px-6 py-4 text-center text-sm text-gray-500">Подарков пока нет</td>
                             </tr>
                         @endforelse
                     </tbody>

@@ -82,4 +82,17 @@ class Database:
         except Exception as e:
             logger.error(f"Error saving gift price: {e}")
             self.conn.rollback()
+            return False
+
+    def update_gift_image(self, gift_id: int, image_path: str) -> bool:
+        try:
+            with self.conn.cursor() as cursor:
+                cursor.execute(
+                    "UPDATE gifts SET image = %s WHERE id = %s",
+                    (image_path, gift_id)
+                )
+                self.conn.commit()
+                return True
+        except Exception as e:
+            logger.error(f"Error updating gift image: {e}")
             return False 
