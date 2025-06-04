@@ -8,6 +8,8 @@ from config.database import Database
 from config.config import DB_CONFIG
 from config.logger import logger
 from datetime import datetime
+import random
+import time
 
 class Tonnel:
     def __init__(self, test_mode: bool = False, test_pages: int = 2):
@@ -30,6 +32,10 @@ class Tonnel:
         }
 
         try:
+            # Добавляем рандомную задержку перед запросом
+            delay = random.uniform(1, 2)
+            time.sleep(delay)
+            
             response = requests.post(
                 f'{self.base_url}/pageGifts',
                 json=json_data,
