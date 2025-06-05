@@ -74,7 +74,7 @@ class FavoriteGiftsController extends Controller
         // Получаем отсортированные и пагинированные подарки для отображения
         $favoriteGifts = (clone $baseQuery)
             ->with(['prices' => function ($query) {
-                $query->latest('checked_at');
+                $query->orderBy('checked_at', 'desc');
             }])
             ->orderBy($sortField, $sortDirection)
             ->paginate(50)
