@@ -27,7 +27,7 @@ class Tonnel:
             'page': page,
             'limit': limit,
             'sort': '',
-            'filter': '',
+            'filter': self.search_name if self.search_name else '',
             'price_range': None,
             'user_auth': ''
         }
