@@ -27,7 +27,7 @@ class Tonnel:
             'page': page,
             'limit': limit,
             'sort': '',
-            'filter': self.search_name if self.search_name else '',
+            'filter': json.dumps({'name': self.search_name}) if self.search_name else '',
             'price_range': None,
             'user_auth': ''
         }
@@ -45,6 +45,7 @@ class Tonnel:
 
             if response.status_code != 200:
                 logger.error(f"Error fetching data: {response.status_code}")
+                logger.error(f"Request data: {json_data}")
                 return []
 
             return response.json()
