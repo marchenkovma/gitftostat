@@ -12,12 +12,13 @@ import random
 import time
 
 class Tonnel:
-    def __init__(self, test_mode: bool = False, test_pages: int = 2):
+    def __init__(self, test_mode: bool = False, test_pages: int = 2, search_name: Optional[str] = None):
         self.base_url = 'https://gifts2.tonnel.network/api'
         self.db = Database()
         self.processed_gifts: Set[str] = set()
         self.test_mode = test_mode
         self.test_pages = test_pages
+        self.search_name = search_name.lower() if search_name else None
         self.start_time = time.time()
         logger.info("Tonnel client initialized")
 
@@ -56,6 +57,10 @@ class Tonnel:
         model = gift.get('model')
         
         if name and model:
+            # Если указано имя для поиска, проверяем совпадение
+            if self.search_name and self.search_name not in name.lower():
+                return
+
             gift_key = f"{name}|{model}"
             if gift_key not in self.processed_gifts:
                 self.processed_gifts.add(gift_key)
@@ -112,10 +117,11 @@ def main():
     parser = argparse.ArgumentParser(description='Fetch gifts from Tonnel API')
     parser.add_argument('--test', action='store_true', help='Run in test mode')
     parser.add_argument('--pages', type=int, default=2, help='Number of pages to process in test mode')
+    parser.add_argument('--name', type=str, help='Search for gifts by name')
     args = parser.parse_args()
 
     start_time = time.time()
-    tonnel = Tonnel(test_mode=args.test, test_pages=args.pages)
+    tonnel = Tonnel(test_mode=args.test, test_pages=args.pages, search_name=args.name)
     tonnel.fetch_all_gifts()
     total_time = time.time() - start_time
     logger.info(f"Total script execution time: {total_time:.2f} seconds")
