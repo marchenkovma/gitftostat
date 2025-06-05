@@ -42,7 +42,12 @@
     <body class="bg-white text-gray-900">
         <main class="p-6">
             <div class="flex justify-between items-center mb-6">
-                <h1 class="text-2xl font-medium">Избранные подарки</h1>
+                <div class="flex items-center gap-4">
+                    <h1 class="text-2xl font-medium">Избранные подарки</h1>
+                    <a href="{{ route('gifts.index') }}" class="text-blue-600 hover:text-blue-800">
+                        Все подарки
+                    </a>
+                </div>
                 @if($favoriteGifts->isNotEmpty())
                     <div class="text-lg font-medium">
                         Общая стоимость: <span class="text-green-600">{{ number_format($totalPrice, 2) }} TON</span>
