@@ -77,7 +77,7 @@
             </div>
 
             <div class="mt-4">
-                {{ $gifts->links() }}
+                {{ $gifts->onEachSide(1)->links() }}
             </div>
         </main>
     </body>
