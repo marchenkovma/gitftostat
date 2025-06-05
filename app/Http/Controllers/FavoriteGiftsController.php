@@ -68,9 +68,9 @@ class FavoriteGiftsController extends Controller
 
         // Получаем все подарки для подсчета общей суммы с последними ценами
         $totalPrice = DB::table('gifts')
-            ->join('prices', function ($join) {
-                $join->on('gifts.id', '=', 'prices.gift_id')
-                    ->whereRaw('prices.checked_at = (SELECT MAX(checked_at) FROM prices WHERE gift_id = gifts.id)');
+            ->join('gift_prices', function ($join) {
+                $join->on('gifts.id', '=', 'gift_prices.gift_id')
+                    ->whereRaw('gift_prices.checked_at = (SELECT MAX(checked_at) FROM gift_prices WHERE gift_id = gifts.id)');
             })
             ->where(function ($query) use ($gifts) {
                 foreach ($gifts as $gift) {
@@ -80,7 +80,7 @@ class FavoriteGiftsController extends Controller
                     });
                 }
             })
-            ->sum('prices.price');
+            ->sum('gift_prices.price');
 
         // Получаем отсортированные и пагинированные подарки для отображения
         $favoriteGifts = $query->orderBy($sortField, $sortDirection)
