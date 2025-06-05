@@ -54,36 +54,29 @@ class FavoriteGiftsController extends Controller
             ['name' => 'Big Year', 'model' => 'Van Gogh'],
         ];
 
-        $query = Gift::where(function ($query) use ($gifts) {
+        $baseQuery = Gift::where(function ($query) use ($gifts) {
             foreach ($gifts as $gift) {
                 $query->orWhere(function ($q) use ($gift) {
                     $q->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower($gift['name']) . '%'])
                       ->whereRaw('LOWER(model) LIKE ?', ['%' . strtolower($gift['model']) . '%']);
                 });
             }
-        })
-        ->with(['prices' => function ($query) {
-            $query->latest('checked_at');
-        }]);
+        });
 
         // Получаем все подарки для подсчета общей суммы с последними ценами
-        $totalPrice = DB::table('gifts')
+        $totalPrice = (clone $baseQuery)
             ->join('gift_prices', function ($join) {
                 $join->on('gifts.id', '=', 'gift_prices.gift_id')
                     ->whereRaw('gift_prices.checked_at = (SELECT MAX(checked_at) FROM gift_prices WHERE gift_id = gifts.id)');
             })
-            ->where(function ($query) use ($gifts) {
-                foreach ($gifts as $gift) {
-                    $query->orWhere(function ($q) use ($gift) {
-                        $q->whereRaw('LOWER(gifts.name) LIKE ?', ['%' . strtolower($gift['name']) . '%'])
-                          ->whereRaw('LOWER(gifts.model) LIKE ?', ['%' . strtolower($gift['model']) . '%']);
-                    });
-                }
-            })
             ->sum('gift_prices.price');
 
         // Получаем отсортированные и пагинированные подарки для отображения
-        $favoriteGifts = $query->orderBy($sortField, $sortDirection)
+        $favoriteGifts = (clone $baseQuery)
+            ->with(['prices' => function ($query) {
+                $query->latest('checked_at');
+            }])
+            ->orderBy($sortField, $sortDirection)
             ->paginate(50)
             ->withQueryString();
 
