@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\GiftController;
+use App\Http\Controllers\FavoriteGiftsController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -8,3 +9,4 @@ Route::get('/', function () {
 });
 
 Route::resource('gifts', GiftController::class);
+Route::get('/favorites', [FavoriteGiftsController::class, 'index'])->name('favorites.index');
