@@ -27,7 +27,12 @@
     </head>
     <body class="bg-white text-gray-900">
         <main class="p-6">
-            <h1 class="text-2xl font-medium mb-6">Список подарков</h1>
+            <div class="flex justify-between items-center mb-6">
+                <h1 class="text-2xl font-medium">Список подарков</h1>
+                <a href="{{ route('favorites.index') }}" class="text-blue-600 hover:text-blue-800">
+                    Избранное
+                </a>
+            </div>
             
             <div class="overflow-x-auto">
                 <table class="min-w-full bg-white border border-gray-200">
