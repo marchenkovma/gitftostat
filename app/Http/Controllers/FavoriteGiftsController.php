@@ -51,6 +51,7 @@ class FavoriteGiftsController extends Controller
             ['name' => 'Jack-in-the-Box', 'model' => 'Doughnut'],
             ['name' => 'Ginger Cookie', 'model' => 'Icing Sugar'],
             ['name' => 'Tama Gadget', 'model' => 'Grape'],
+            ['name' => 'Big Year', 'model' => 'Van Gogh'],
         ];
 
         $query = Gift::where(function ($query) use ($gifts) {
