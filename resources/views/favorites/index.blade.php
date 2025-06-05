@@ -23,6 +23,20 @@
                 -webkit-overflow-scrolling: touch;
                 padding-bottom: env(safe-area-inset-bottom);
             }
+            .sort-link {
+                display: flex;
+                align-items: center;
+                gap: 0.25rem;
+                color: inherit;
+                text-decoration: none;
+            }
+            .sort-link:hover {
+                color: #4B5563;
+            }
+            .sort-link.active {
+                color: #111827;
+                font-weight: 500;
+            }
         </style>
     </head>
     <body class="bg-white text-gray-900">
@@ -42,7 +56,19 @@
                         <tr class="bg-gray-50">
                             <th class="px-6 py-3 border-b text-left text-xs font-medium text-gray-500 uppercase tracking-wider">№</th>
                             <th class="px-6 py-3 border-b text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Изображение</th>
-                            <th class="px-6 py-3 border-b text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Название</th>
+                            <th class="px-6 py-3 border-b text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <a href="{{ request()->fullUrlWithQuery(['sort' => 'name', 'direction' => $sortField === 'name' && $sortDirection === 'asc' ? 'desc' : 'asc']) }}" 
+                                   class="sort-link {{ $sortField === 'name' ? 'active' : '' }}">
+                                    Название
+                                    @if($sortField === 'name')
+                                        @if($sortDirection === 'asc')
+                                            ↑
+                                        @else
+                                            ↓
+                                        @endif
+                                    @endif
+                                </a>
+                            </th>
                             <th class="px-6 py-3 border-b text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Модель</th>
                             <th class="px-6 py-3 border-b text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Последняя floor цена</th>
                             <th class="px-6 py-3 border-b text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Дата обновления</th>
@@ -51,7 +77,7 @@
                     <tbody class="divide-y divide-gray-200">
                         @forelse($favoriteGifts as $gift)
                             <tr>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $loop->iteration }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ ($favoriteGifts->currentPage() - 1) * $favoriteGifts->perPage() + $loop->iteration }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <img src="{{ $gift->image ? asset('images/gifts/' . $gift->image) : asset('images/gifts/default.svg') }}" 
                                         alt="{{ $gift->name }}" 
@@ -81,6 +107,10 @@
                         @endforelse
                     </tbody>
                 </table>
+            </div>
+
+            <div class="mt-4">
+                {{ $favoriteGifts->onEachSide(1)->links() }}
             </div>
         </main>
     </body>

@@ -8,8 +8,11 @@ use Illuminate\Support\Facades\DB;
 
 class FavoriteGiftsController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        $sortField = $request->get('sort', 'name');
+        $sortDirection = $request->get('direction', 'asc');
+
         $favoriteGifts = Gift::where(function ($query) {
             $gifts = [
                 ['name' => 'Restless Jar', 'model' => 'Chocolate'],
@@ -49,6 +52,7 @@ class FavoriteGiftsController extends Controller
                 ['name' => 'Jack-in-the-Box', 'model' => 'Doughnut'],
                 ['name' => 'Ginger Cookie', 'model' => 'Icing Sugar'],
                 ['name' => 'Tama Gadget', 'model' => 'Grape'],
+                ['name' => 'Big Year', 'model' => 'Van Gogh'],
             ];
 
             foreach ($gifts as $gift) {
@@ -61,12 +65,14 @@ class FavoriteGiftsController extends Controller
         ->with(['prices' => function ($query) {
             $query->latest('checked_at');
         }])
-        ->get();
+        ->orderBy($sortField, $sortDirection)
+        ->paginate(10)
+        ->withQueryString();
 
         $totalPrice = $favoriteGifts->sum(function ($gift) {
             return $gift->prices->first()?->price ?? 0;
         });
 
-        return view('favorites.index', compact('favoriteGifts', 'totalPrice'));
+        return view('favorites.index', compact('favoriteGifts', 'totalPrice', 'sortField', 'sortDirection'));
     }
 } 
