@@ -66,11 +66,21 @@ class FavoriteGiftsController extends Controller
             $query->latest('checked_at');
         }]);
 
-        // Получаем все подарки для подсчета общей суммы
-        $allFavoriteGifts = (clone $query)->get();
-        $totalPrice = $allFavoriteGifts->sum(function ($gift) {
-            return $gift->prices->first()?->price ?? 0;
-        });
+        // Получаем все подарки для подсчета общей суммы с последними ценами
+        $totalPrice = DB::table('gifts')
+            ->join('prices', function ($join) {
+                $join->on('gifts.id', '=', 'prices.gift_id')
+                    ->whereRaw('prices.checked_at = (SELECT MAX(checked_at) FROM prices WHERE gift_id = gifts.id)');
+            })
+            ->where(function ($query) use ($gifts) {
+                foreach ($gifts as $gift) {
+                    $query->orWhere(function ($q) use ($gift) {
+                        $q->whereRaw('LOWER(gifts.name) LIKE ?', ['%' . strtolower($gift['name']) . '%'])
+                          ->whereRaw('LOWER(gifts.model) LIKE ?', ['%' . strtolower($gift['model']) . '%']);
+                    });
+                }
+            })
+            ->sum('prices.price');
 
         // Получаем отсортированные и пагинированные подарки для отображения
         $favoriteGifts = $query->orderBy($sortField, $sortDirection)
