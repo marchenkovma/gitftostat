@@ -45,12 +45,10 @@
                         @forelse($gifts as $gift)
                             <tr>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ ($gifts->currentPage() - 1) * $gifts->perPage() + $loop->iteration }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-center">
-                                    <div class="flex justify-center">
-                                        <img src="{{ $gift->image ? asset('images/gifts/' . $gift->image) : asset('images/gifts/default.svg') }}" 
-                                             alt="{{ $gift->name }}" 
-                                             class="w-16">
-                                    </div>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <img src="{{ $gift->image ? asset('images/gifts/' . $gift->image) : asset('images/gifts/default.svg') }}" 
+                                        alt="{{ $gift->name }}" 
+                                        class="w-16">
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $gift->name }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $gift->model }}</td>
