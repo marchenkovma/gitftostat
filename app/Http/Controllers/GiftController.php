@@ -21,17 +21,13 @@ class GiftController extends Controller
 
         // Если применены фильтры, сортируем по цене
         if ($request->filled('name') || $request->filled('model')) {
-            $query->with(['prices' => function($q) {
-                $q->latest();
-            }])
-            ->orderBy(function($query) {
-                $query->select('price')
-                    ->from('gift_prices')
-                    ->whereColumn('gift_id', 'gifts.id')
-                    ->latest()
-                    ->limit(1);
-            }, 'asc')
-            ->orderBy('name', 'asc');
+            $query->join('gift_prices', function($join) {
+                $join->on('gifts.id', '=', 'gift_prices.gift_id')
+                    ->whereRaw('gift_prices.id = (SELECT id FROM gift_prices WHERE gift_id = gifts.id ORDER BY created_at DESC LIMIT 1)');
+            })
+            ->orderBy('gift_prices.price', 'asc')
+            ->orderBy('gifts.name', 'asc')
+            ->select('gifts.*');
         } else {
             // Если фильтры не применены, сортируем только по имени
             $query->orderBy('name', 'asc');
