@@ -13,18 +13,3 @@
 @theme {
     --color-primary: #4a6cf7;
   }
-
-html, body {
-    /* height: 100%; */
-    /* overflow: hidden; */
-    /* position: fixed; */
-    /* width: 100%; */
-    -webkit-overflow-scrolling: touch;
-}
-
-main {
-    /* height: 100%; */
-    /* overflow-y: auto; */
-    -webkit-overflow-scrolling: touch;
-    /* padding-bottom: env(safe-area-inset-bottom); */
-}
