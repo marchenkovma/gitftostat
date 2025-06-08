@@ -23,6 +23,7 @@
                 height: 100%;
                 overflow-y: auto;
                 -webkit-overflow-scrolling: touch;
+                scrollbar-color: #4b5563 #1f2937;
             }
         </style>
     </head>
