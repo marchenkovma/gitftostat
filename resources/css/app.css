@@ -9,3 +9,22 @@
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
 }
+
+@theme {
+    --color-primary: #4a6cf7;
+  }
+
+html, body {
+    /* height: 100%; */
+    /* overflow: hidden; */
+    /* position: fixed; */
+    /* width: 100%; */
+    -webkit-overflow-scrolling: touch;
+}
+
+main {
+    /* height: 100%; */
+    /* overflow-y: auto; */
+    -webkit-overflow-scrolling: touch;
+    /* padding-bottom: env(safe-area-inset-bottom); */
+}

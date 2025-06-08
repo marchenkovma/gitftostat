@@ -9,7 +9,12 @@ class GiftPrice extends Model
 {
     protected $fillable = [
         'gift_id',
-        'price'
+        'price',
+        'checked_at'
+    ];
+
+    protected $casts = [
+        'checked_at' => 'datetime'
     ];
 
     public function gift(): BelongsTo

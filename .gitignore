@@ -24,9 +24,3 @@ Homestead.yaml
 npm-debug.log
 Thumbs.db
 yarn-error.log
-scripts/tonnel/venv/
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-.Python
