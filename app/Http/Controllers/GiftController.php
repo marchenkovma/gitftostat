@@ -19,15 +19,39 @@ class GiftController extends Controller
             $query->where('model', 'like', '%' . $request->model . '%');
         }
 
-        $gifts = $query->orderBy('name', 'asc')
-            ->paginate(50)
-            ->withQueryString();
+        // Если применены фильтры, сортируем по цене
+        if ($request->filled('name') || $request->filled('model')) {
+            $query->with(['prices' => function($q) {
+                $q->latest();
+            }])
+            ->orderBy(function($query) {
+                $query->select('price')
+                    ->from('gift_prices')
+                    ->whereColumn('gift_id', 'gifts.id')
+                    ->latest()
+                    ->limit(1);
+            }, 'asc')
+            ->orderBy('name', 'asc');
+        } else {
+            // Если фильтры не применены, сортируем только по имени
+            $query->orderBy('name', 'asc');
+        }
 
-        // Получаем списки для фильтров
+        $gifts = $query->paginate(50)->withQueryString();
+
+        // Получаем уникальные имена
         $names = Gift::distinct()->pluck('name')->sort()->values();
-        $models = Gift::distinct()->pluck('model')->sort()->values();
 
-        return view('gifts.index', compact('gifts', 'names', 'models'));
+        // Получаем модели, сгруппированные по именам
+        $modelsByName = Gift::select('name', 'model')
+            ->distinct()
+            ->get()
+            ->groupBy('name')
+            ->map(function ($items) {
+                return $items->pluck('model')->sort()->values();
+            });
+
+        return view('gifts.index', compact('gifts', 'names', 'modelsByName'));
     }
 
     public function getFilterOptions(Request $request)

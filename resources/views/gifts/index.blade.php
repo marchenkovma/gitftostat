@@ -12,7 +12,7 @@
                 <label for="name" class="block text-sm font-medium text-gray-300 mb-1">{{ __('Name') }}</label>
                 <select id="name" 
                         class="w-full rounded-lg border-gray-700 bg-gray-800 text-white focus:border-blue-500 focus:ring-blue-500"
-                        onchange="submitForm()">
+                        onchange="updateModels()">
                     <option value="">{{ __('Select name') }}</option>
                     @foreach($names as $name)
                         <option value="{{ $name }}" {{ request('name') == $name ? 'selected' : '' }}>{{ $name }}</option>
@@ -26,9 +26,6 @@
                         class="w-full rounded-lg border-gray-700 bg-gray-800 text-white focus:border-blue-500 focus:ring-blue-500"
                         onchange="submitForm()">
                     <option value="">{{ __('Select model') }}</option>
-                    @foreach($models as $model)
-                        <option value="{{ $model }}" {{ request('model') == $model ? 'selected' : '' }}>{{ $model }}</option>
-                    @endforeach
                 </select>
             </div>
         </div>
@@ -53,6 +50,47 @@
     </div>
 
     <script>
+        // Объект с моделями для каждого имени
+        const modelsByName = @json($modelsByName);
+        let isInitialLoad = true;
+
+        // Функция для обновления списка моделей
+        function updateModels() {
+            const nameSelect = document.getElementById('name');
+            const modelSelect = document.getElementById('model');
+            const selectedName = nameSelect.value;
+
+            // Очищаем текущий список моделей
+            modelSelect.innerHTML = '<option value="">{{ __('Select model') }}</option>';
+
+            // Если имя выбрано, добавляем соответствующие модели
+            if (selectedName && modelsByName[selectedName]) {
+                modelsByName[selectedName].forEach(model => {
+                    const option = document.createElement('option');
+                    option.value = model;
+                    option.textContent = model;
+                    if (model === localStorage.getItem('giftModelFilter')) {
+                        option.selected = true;
+                    }
+                    modelSelect.appendChild(option);
+                });
+            }
+
+            // Сохраняем выбранное имя
+            saveFilters(selectedName, modelSelect.value);
+            
+            // Если имя изменилось, сбрасываем модель
+            if (selectedName !== localStorage.getItem('giftNameFilter')) {
+                modelSelect.value = '';
+                saveFilters(selectedName, '');
+            }
+
+            // Не вызываем submitForm при начальной загрузке
+            if (!isInitialLoad) {
+                submitForm();
+            }
+        }
+
         // Функция для сохранения фильтров в localStorage
         function saveFilters(name, model) {
             localStorage.setItem('giftNameFilter', name);
@@ -87,15 +125,16 @@
             
             if (savedName) {
                 document.getElementById('name').value = savedName;
-            }
-            if (savedModel) {
-                document.getElementById('model').value = savedModel;
+                updateModels();
             }
 
             // Если есть сохраненные фильтры, но нет параметров в URL, применяем их
             if ((savedName || savedModel) && !window.location.search) {
+                isInitialLoad = false;
                 submitForm();
             }
+
+            isInitialLoad = false;
         });
     </script>
 </x-app-layout>
