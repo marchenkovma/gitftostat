@@ -38,8 +38,9 @@ class TonnelPriceChecker:
         try:
             # Добавляем рандомную задержку перед запросом
             delay = random.uniform(1, 2)
-            time.sleep(delay)
-        
+            #time.sleep(delay)
+            asyncio.sleep(1)
+            
             response = requests.post(
                 f'{self.base_url}/pageGifts',
                 json=json_data,
