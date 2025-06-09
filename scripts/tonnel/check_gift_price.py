@@ -47,9 +47,23 @@ class TonnelPriceChecker:
                 impersonate="chrome"
             )
 
-            if response.status_code != 200:
-                logger.error(f"Error fetching data: {response.status_code}")
-                return None
+        if response.status_code == 429:  # Ошибка "Too Many Requests"
+            retry_after = response.headers.get("Retry-After")
+            if retry_after:
+                wait_time = int(retry_after)
+                logger.warning(f"Сервер требует подождать {wait_time} секунд...")
+                print(f"Сервер требует подождать {wait_time} секунд...")
+                time.sleep(wait_time)
+            else:
+                logger.warning("Сервер не указал время ожидания, ставим паузу 5 сек.")
+                print("Сервер не указал время ожидания, ставим паузу 5 сек.")
+                time.sleep(5)  # Ожидание по умолчанию
+
+            return self.check_gift_price(gift_name, model)  # Повторный запрос после паузы
+
+        if response.status_code != 200:
+            logger.error(f"Error fetching data: {response.status_code}")
+            return None
 
             data = response.json()
             if data and len(data) > 0:
