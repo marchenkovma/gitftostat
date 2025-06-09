@@ -21,7 +21,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // Проверка цен подарков каждые 2 часа
         $schedule->command('tonnel:check-gift-prices')
                 ->everyTwoHours()
-                ->withoutOverlapping()Add commentMore actions
+                ->withoutOverlapping()
                 ->appendOutputTo(storage_path('logs/tonnel-scheduler.log'));
     })
     ->create();
