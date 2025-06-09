@@ -23,5 +23,8 @@ return Application::configure(basePath: dirname(__DIR__))
                 ->everyTwoHours()
                 ->withoutOverlapping()
                 ->appendOutputTo(storage_path('logs/tonnel-scheduler.log'));
+        
+        $schedule->command('inspire')->everyMinute()
+            ->appendOutputTo(storage_path('logs/test-scheduler.log'));;
     })
     ->create();
