@@ -9,6 +9,7 @@ from config.logger import logger
 from datetime import datetime
 import random
 import time
+import asyncio
 
 class TonnelPriceChecker:
     def __init__(self):
@@ -39,7 +40,7 @@ class TonnelPriceChecker:
             # Добавляем рандомную задержку перед запросом
             delay = random.uniform(1, 2)
             #time.sleep(delay)
-            asyncio.sleep(1)
+            asyncio.sleep(0.30)
             
             response = requests.post(
                 f'{self.base_url}/pageGifts',
