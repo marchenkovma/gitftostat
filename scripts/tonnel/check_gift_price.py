@@ -36,40 +36,39 @@ class TonnelPriceChecker:
         }
 
         try:
-            # Добавляем рандомную задержку перед запросом
+            # Запрос с задержкой
             delay = random.uniform(1, 2)
             time.sleep(delay)
-            #asyncio.sleep(0.30)
-            
+        
             response = requests.post(
                 f'{self.base_url}/pageGifts',
                 json=json_data,
                 impersonate="chrome"
             )
-
-        if response.status_code == 429:  # Ошибка "Too Many Requests"
-            retry_after = response.headers.get("Retry-After")
-            if retry_after:
-                wait_time = int(retry_after)
-                logger.warning(f"Сервер требует подождать {wait_time} секунд...")
-                print(f"Сервер требует подождать {wait_time} секунд...")
-                time.sleep(wait_time)
-            else:
-                logger.warning("Сервер не указал время ожидания, ставим паузу 5 сек.")
-                print("Сервер не указал время ожидания, ставим паузу 5 сек.")
-                time.sleep(5)  # Ожидание по умолчанию
-
-            return self.check_gift_price(gift_name, model)  # Повторный запрос после паузы
-
-        if response.status_code != 200:
-            logger.error(f"Error fetching data: {response.status_code}")
-            return None
-
+        
+            # Проверка ошибки 429 (Too Many Requests)
+            if response.status_code == 429:
+                retry_after = response.headers.get("Retry-After")
+                if retry_after:
+                    wait_time = int(retry_after)
+                    logger.warning(f"Сервер требует подождать {wait_time} секунд...")
+                    print(f"Сервер требует подождать {wait_time} секунд...")
+                    time.sleep(wait_time)
+                else:
+                    logger.warning("Сервер не указал время ожидания, ставим паузу 5 сек.")
+                    print("Сервер не указал время ожидания, ставим паузу 5 сек.")
+                    time.sleep(5)  # Ожидание по умолчанию
+                
+                # Повторный вызов после паузы
+                return self.check_gift_price(gift_name, model)
+        
+            if response.status_code != 200:
+                logger.error(f"Error fetching data: {response.status_code}")
+                return None
+        
             data = response.json()
-            if data and len(data) > 0:
-                return data[0]
-            return None
-
+            return data[0] if data else None
+        
         except Exception as e:
             logger.error(f"Error in check_gift_price: {e}")
             return None
