@@ -20,20 +20,8 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withSchedule(function (Schedule $schedule) {
         // Проверка цен подарков каждые 2 часа
         $schedule->command('tonnel:check-gift-prices')
-         ->everyMinute()
-         ->before(function () {
-             if (\Illuminate\Support\Facades\Cache::has('tonnel:running')) {
-                 return false; // Пропускаем выполнение, если задача уже запущена
-             }
-             Cache::put('tonnel:running', true, 5); // Устанавливаем флаг на 5 минут
-         })
-         ->after(function () {
-             Cache::forget('tonnel:running'); // Очищаем флаг после выполнения
-         })
-         ->appendOutputTo(storage_path('logs/tonnel-scheduler.log'));
-
-        
-        $schedule->command('inspire')->everyMinute()
-            ->appendOutputTo(storage_path('logs/test-scheduler.log'));;
+                ->everyTwoHours()
+                ->withoutOverlapping()Add commentMore actions
+                ->appendOutputTo(storage_path('logs/tonnel-scheduler.log'));
     })
     ->create();
