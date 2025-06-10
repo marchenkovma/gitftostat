@@ -52,6 +52,10 @@ class FavoriteGiftsController extends Controller
             ['name' => 'Ginger Cookie', 'model' => 'Icing Sugar'],
             ['name' => 'Tama Gadget', 'model' => 'Grape'],
             ['name' => 'Big Year', 'model' => 'Van Gogh'],
+            ['name' => 'Lol Pop', 'model' => 'Rose Wine'],
+            ['name' => 'Lol Pop', 'model' => 'Rose Wine'],
+            ['name' => 'B-Day Candle', 'model' => 'Soap Bubbles'],
+            ['name' => 'Xmas Stocking', 'model' => 'Electric Sock'],
         ];
 
         $baseQuery = Gift::where(function ($query) use ($gifts) {
