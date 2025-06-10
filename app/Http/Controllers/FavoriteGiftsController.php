@@ -53,8 +53,8 @@ class FavoriteGiftsController extends Controller
             ['name' => 'Tama Gadget', 'model' => 'Grape'],
             ['name' => 'Big Year', 'model' => 'Van Gogh'],
             ['name' => 'Lol Pop', 'model' => 'Rose Wine'],
-            ['name' => 'Lol Pop', 'model' => 'Rose Wine'],
-            ['name' => 'B-Day Candle', 'model' => 'Soap Bubbles'],
+            ['name' => 'Lol Pop', 'model' => 'Soap Bubbles'],
+            ['name' => 'B-Day Candle', 'model' => 'Melted Butter'],
             ['name' => 'Xmas Stocking', 'model' => 'Electric Sock'],
         ];
 
