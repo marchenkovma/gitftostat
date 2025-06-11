@@ -18,9 +18,14 @@ return Application::configure(basePath: dirname(__DIR__))
         //
     })
     ->withSchedule(function (Schedule $schedule) {
-        // Проверка цен подарков каждые 2 часа
         $schedule->command('tonnel:check-gift-prices')
-                ->everyTwoHours()
+                ->dailyAt('03:00')
+                ->withoutOverlapping()
+                ->appendOutputTo(storage_path('logs/tonnel-scheduler.log'));
+
+        // Запуск команды загрузки изображений в 5 утра
+        $schedule->command('gifts:download-images')
+                ->dailyAt('05:00')
                 ->withoutOverlapping()
                 ->appendOutputTo(storage_path('logs/tonnel-scheduler.log'));
     })
