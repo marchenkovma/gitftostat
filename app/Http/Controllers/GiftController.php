@@ -38,7 +38,7 @@ class GiftController extends Controller
 
         // Если применены фильтры, сортируем по цене
         if ($request->filled('name') || $request->filled('model')) {
-            $query->join('gift_prices', function($join) {
+            $query->leftJoin('gift_prices', function($join) {
                 $join->on('gifts.id', '=', 'gift_prices.gift_id')
                     ->whereRaw('gift_prices.id = (SELECT id FROM gift_prices WHERE gift_id = gifts.id ORDER BY created_at DESC LIMIT 1)');
             })
