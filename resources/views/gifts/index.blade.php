@@ -86,31 +86,17 @@
             if (name) params.append('name', name);
             if (model) params.append('model', model);
             
-            // Используем абсолютный URL
-            const baseUrl = window.location.origin + '{{ route('gifts.index') }}';
-            const url = baseUrl + (params.toString() ? '?' + params.toString() : '');
+            // Используем относительный URL
+            const url = '{{ route('gifts.index') }}' + (params.toString() ? '?' + params.toString() : '');
             
             console.log('Filter details:', {
                 name: name,
                 model: model,
-                baseUrl: baseUrl,
-                finalUrl: url,
+                url: url,
                 params: params.toString()
             });
             
-            // Сначала проверим URL через отладочный маршрут
-            fetch(window.location.origin + '/debug-params?' + params.toString())
-                .then(response => response.json())
-                .then(data => {
-                    console.log('Debug params response:', data);
-                    // Если отладочный запрос успешен, переходим по основному URL
-                    window.location.href = url;
-                })
-                .catch(error => {
-                    console.error('Debug params error:', error);
-                    // В случае ошибки все равно пробуем перейти по основному URL
-                    window.location.href = url;
-                });
+            window.location.href = url;
         }
 
         // Обработчик изменения имени
@@ -118,11 +104,7 @@
             const nameSelect = document.getElementById('name');
             const selectedName = nameSelect.value;
             
-            console.log('Name changed:', {
-                value: selectedName,
-                element: nameSelect,
-                options: Array.from(nameSelect.options).map(opt => ({value: opt.value, text: opt.text}))
-            });
+            console.log('Name changed:', selectedName);
             
             // Сохраняем выбранное имя
             localStorage.setItem('giftNameFilter', selectedName);
@@ -142,11 +124,7 @@
             const modelSelect = document.getElementById('model');
             const selectedModel = modelSelect.value;
             
-            console.log('Model changed:', {
-                value: selectedModel,
-                element: modelSelect,
-                options: Array.from(modelSelect.options).map(opt => ({value: opt.value, text: opt.text}))
-            });
+            console.log('Model changed:', selectedModel);
             
             // Сохраняем выбранную модель
             localStorage.setItem('giftModelFilter', selectedModel);
