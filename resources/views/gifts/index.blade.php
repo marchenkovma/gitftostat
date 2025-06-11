@@ -6,6 +6,17 @@
         </a>
     </div>
 
+    @if(config('app.debug'))
+        <div class="mb-4 p-4 bg-gray-800 rounded-lg text-sm text-gray-300">
+            <p>Debug info:</p>
+            <p>Total gifts: {{ $gifts->total() }}</p>
+            <p>Current page: {{ $gifts->currentPage() }}</p>
+            <p>Per page: {{ $gifts->perPage() }}</p>
+            <p>Has pages: {{ $gifts->hasPages() ? 'Yes' : 'No' }}</p>
+            <p>Filters: name={{ request('name') }}, model={{ request('model') }}</p>
+        </div>
+    @endif
+
     <div class="mb-6 space-y-4">
         <div class="flex flex-col sm:flex-row gap-4">
             <div class="flex-1">
@@ -40,9 +51,13 @@
     </div>
 
     <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-        @foreach($gifts as $gift)
+        @forelse($gifts as $gift)
             <x-gift-card :gift="$gift" />
-        @endforeach
+        @empty
+            <div class="col-span-full text-center text-gray-400 dark:text-gray-500 py-8">
+                {{ __('No gifts found') }}
+            </div>
+        @endforelse
     </div>
 
     <div class="mt-6">
@@ -86,15 +101,8 @@
             if (name) params.append('name', name);
             if (model) params.append('model', model);
             
-            // Используем относительный URL
             const url = '{{ route('gifts.index') }}' + (params.toString() ? '?' + params.toString() : '');
-            
-            console.log('Filter details:', {
-                name: name,
-                model: model,
-                url: url,
-                params: params.toString()
-            });
+            console.log('Applying filters, URL:', url);
             
             window.location.href = url;
         }

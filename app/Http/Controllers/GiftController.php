@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Gift;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 
 class GiftController extends Controller
 {
@@ -20,13 +21,19 @@ class GiftController extends Controller
         $query = Gift::query();
 
         if ($request->filled('name')) {
+            // Проверяем, есть ли подарки с таким именем
+            $giftsWithName = Gift::where('name', $request->name)->count();
+            Log::info('Gifts with name count:', ['name' => $request->name, 'count' => $giftsWithName]);
+            
+            // Выводим все имена в базе для проверки
+            $allNames = Gift::distinct()->pluck('name')->toArray();
+            Log::info('All names in database:', $allNames);
+            
             $query->where('name', $request->name);
-            Log::info('Applied name filter:', ['name' => $request->name]);
         }
 
         if ($request->filled('model')) {
             $query->where('model', 'like', '%' . $request->model . '%');
-            Log::info('Applied model filter:', ['model' => $request->model]);
         }
 
         // Если применены фильтры, сортируем по цене
@@ -44,12 +51,18 @@ class GiftController extends Controller
         }
 
         // Логируем SQL запрос
-        Log::info('SQL Query:', ['sql' => $query->toSql(), 'bindings' => $query->getBindings()]);
+        Log::info('SQL Query:', [
+            'sql' => $query->toSql(),
+            'bindings' => $query->getBindings()
+        ]);
 
+        // Выполняем запрос и логируем результат
         $gifts = $query->paginate(50)->withQueryString();
-
-        // Логируем количество найденных подарков
-        Log::info('Found gifts:', ['count' => $gifts->count()]);
+        Log::info('Query result:', [
+            'total' => $gifts->total(),
+            'count' => $gifts->count(),
+            'first_item' => $gifts->first() ? $gifts->first()->toArray() : null
+        ]);
 
         // Получаем уникальные имена
         $names = Gift::distinct()->pluck('name')->sort()->values();
