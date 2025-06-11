@@ -4,6 +4,7 @@ from typing import List, Dict, Set, Optional
 from curl_cffi import requests
 from config.database import Database
 from config.logger import logger
+import random
 
 class TonnelGiftFetcher:
     """
@@ -31,6 +32,11 @@ class TonnelGiftFetcher:
         
         # Запоминаем время начала работы
         self.start_time = time.time()
+        
+        # Настройки для запросов
+        self.timeout = 60  # таймаут в секундах
+        self.max_retries = 10  # максимальное количество попыток
+        self.retry_delay = 5  # начальная задержка между попытками
         
         # Выводим сообщение о начале работы
         self._log("Starting Tonnel API client")
@@ -65,19 +71,23 @@ class TonnelGiftFetcher:
             'user_auth': ''
         }
 
-        # Настройки для повторных попыток при ошибках
-        max_retries = 10  # максимальное количество попыток
-        retry_delay = 5   # начальная задержка между попытками
-        current_retry = 0 # текущая попытка
+        current_retry = 0  # текущая попытка
 
         # Пробуем получить данные, пока не достигнем максимального числа попыток
-        while current_retry < max_retries:
+        while current_retry < self.max_retries:
             try:
+                # Добавляем случайную задержку перед запросом
+                delay = 2 + (current_retry * 0.5)  # увеличиваем задержку с каждой попыткой
+                time.sleep(delay)
+                
+                self._log(f"Fetching page {page}, attempt {current_retry + 1}/{self.max_retries}")
+                
                 # Отправляем запрос к API
                 response = requests.post(
                     f'{self.base_url}/pageGifts',
                     json=json_data,
-                    impersonate="chrome"
+                    impersonate="chrome",
+                    timeout=self.timeout
                 )
 
                 # Если получили успешный ответ
@@ -86,22 +96,40 @@ class TonnelGiftFetcher:
                 
                 # Если превысили лимит запросов
                 elif response.status_code == 429:
-                    wait_time = retry_delay * (current_retry + 1)
+                    wait_time = self.retry_delay * (current_retry + 1)
                     self._log(f"Rate limit exceeded. Waiting {wait_time} seconds...", "warning")
+                    time.sleep(wait_time)
+                    current_retry += 1
+                
+                # Если сервер недоступен
+                elif response.status_code == 502:
+                    wait_time = self.retry_delay * (current_retry + 1)
+                    self._log(f"Server unavailable (502). Waiting {wait_time} seconds...", "warning")
                     time.sleep(wait_time)
                     current_retry += 1
                 
                 # Если произошла другая ошибка
                 else:
-                    wait_time = retry_delay * (current_retry + 1)
+                    wait_time = self.retry_delay * (current_retry + 1)
                     self._log(f"Error fetching data: {response.status_code}. Retrying in {wait_time} seconds...", "error")
                     time.sleep(wait_time)
                     current_retry += 1
 
+            except requests.exceptions.Timeout:
+                self._log(f"Request timed out after {self.timeout} seconds", "error")
+                if current_retry < self.max_retries - 1:
+                    time.sleep(self.retry_delay)
+                    current_retry += 1
+                else:
+                    return []
+                    
             except Exception as e:
                 self._log(f"Error in fetch_page: {e}", "error")
-                time.sleep(retry_delay)
-                current_retry += 1
+                if current_retry < self.max_retries - 1:
+                    time.sleep(self.retry_delay)
+                    current_retry += 1
+                else:
+                    return []
 
         self._log("Max retries reached. Could not fetch data.", "error")
         return []
@@ -166,8 +194,8 @@ class TonnelGiftFetcher:
 
                 # Переходим к следующей странице
                 page += 1
-                # Ждем 0.25 секунды перед следующим запросом
-                time.sleep(0.25)
+                # Ждем 2-4 секунды перед следующим запросом
+                time.sleep(2 + random.random() * 2)
 
         except Exception as e:
             self._log(f"Error processing page {page}: {e}", "error")
