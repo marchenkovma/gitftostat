@@ -12,7 +12,7 @@ class GiftController extends Controller
         $query = Gift::query();
 
         if ($request->filled('name')) {
-            $query->where('name', 'like', '%' . $request->name . '%');
+            $query->where('name', $request->name);
         }
 
         if ($request->filled('model')) {
