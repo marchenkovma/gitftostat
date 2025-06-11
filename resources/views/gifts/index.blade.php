@@ -77,10 +77,52 @@
             }
         }
 
+        // Функция для применения фильтров
+        function applyFilters() {
+            const name = document.getElementById('name').value;
+            const model = document.getElementById('model').value;
+            const params = new URLSearchParams();
+            
+            if (name) params.append('name', name);
+            if (model) params.append('model', model);
+            
+            // Используем абсолютный URL
+            const baseUrl = window.location.origin + '{{ route('gifts.index') }}';
+            const url = baseUrl + (params.toString() ? '?' + params.toString() : '');
+            
+            console.log('Filter details:', {
+                name: name,
+                model: model,
+                baseUrl: baseUrl,
+                finalUrl: url,
+                params: params.toString()
+            });
+            
+            // Сначала проверим URL через отладочный маршрут
+            fetch(window.location.origin + '/debug-params?' + params.toString())
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Debug params response:', data);
+                    // Если отладочный запрос успешен, переходим по основному URL
+                    window.location.href = url;
+                })
+                .catch(error => {
+                    console.error('Debug params error:', error);
+                    // В случае ошибки все равно пробуем перейти по основному URL
+                    window.location.href = url;
+                });
+        }
+
         // Обработчик изменения имени
         function handleNameChange() {
             const nameSelect = document.getElementById('name');
             const selectedName = nameSelect.value;
+            
+            console.log('Name changed:', {
+                value: selectedName,
+                element: nameSelect,
+                options: Array.from(nameSelect.options).map(opt => ({value: opt.value, text: opt.text}))
+            });
             
             // Сохраняем выбранное имя
             localStorage.setItem('giftNameFilter', selectedName);
@@ -100,23 +142,17 @@
             const modelSelect = document.getElementById('model');
             const selectedModel = modelSelect.value;
             
+            console.log('Model changed:', {
+                value: selectedModel,
+                element: modelSelect,
+                options: Array.from(modelSelect.options).map(opt => ({value: opt.value, text: opt.text}))
+            });
+            
             // Сохраняем выбранную модель
             localStorage.setItem('giftModelFilter', selectedModel);
             
             // Применяем фильтр
             applyFilters();
-        }
-
-        // Функция для применения фильтров
-        function applyFilters() {
-            const name = document.getElementById('name').value;
-            const model = document.getElementById('model').value;
-            const params = new URLSearchParams();
-            
-            if (name) params.append('name', name);
-            if (model) params.append('model', model);
-            
-            window.location.href = '{{ route('gifts.index') }}' + (params.toString() ? '?' + params.toString() : '');
         }
 
         // Функция для очистки фильтров

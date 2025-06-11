@@ -4,19 +4,29 @@ namespace App\Http\Controllers;
 
 use App\Models\Gift;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class GiftController extends Controller
 {
     public function index(Request $request)
     {
+        // Логируем входящие параметры
+        Log::info('Filter parameters:', [
+            'name' => $request->name,
+            'model' => $request->model,
+            'query_string' => $request->getQueryString()
+        ]);
+
         $query = Gift::query();
 
         if ($request->filled('name')) {
             $query->where('name', $request->name);
+            Log::info('Applied name filter:', ['name' => $request->name]);
         }
 
         if ($request->filled('model')) {
             $query->where('model', 'like', '%' . $request->model . '%');
+            Log::info('Applied model filter:', ['model' => $request->model]);
         }
 
         // Если применены фильтры, сортируем по цене
@@ -33,7 +43,13 @@ class GiftController extends Controller
             $query->orderBy('name', 'asc');
         }
 
+        // Логируем SQL запрос
+        Log::info('SQL Query:', ['sql' => $query->toSql(), 'bindings' => $query->getBindings()]);
+
         $gifts = $query->paginate(50)->withQueryString();
+
+        // Логируем количество найденных подарков
+        Log::info('Found gifts:', ['count' => $gifts->count()]);
 
         // Получаем уникальные имена
         $names = Gift::distinct()->pluck('name')->sort()->values();
