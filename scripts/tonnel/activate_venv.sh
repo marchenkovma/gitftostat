@@ -36,8 +36,11 @@ if [ "$1" = "check_gift_price.py" ]; then
 elif [ "$1" = "download_gift_images.py" ]; then
     # Запускаем скрипт загрузки изображений
     python "$(dirname "$0")/download_gift_images.py" "${@:2}"
+elif [ "$1" = "get_gifts.py" ]; then
+    # Запускаем скрипт получения подарков
+    python "$(dirname "$0")/get_gifts.py" "${@:2}"
 else
-    # Запускаем скрипт получения всех подарков
+    # Запускаем старый скрипт получения всех подарков
     python "$(dirname "$0")/fetch_all_gifts.py" "$@"
 fi
 

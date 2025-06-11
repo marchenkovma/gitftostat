@@ -12,7 +12,9 @@ LOG_FILE = os.getenv('TONNEL_LOG_FILE', os.path.join(Path(__file__).resolve().pa
 os.makedirs(os.path.dirname(LOG_FILE), exist_ok=True)
 
 class LaravelFormatter(logging.Formatter):
-    """Форматтер для вывода логов в стиле Laravel"""
+    """
+    Форматтер для вывода логов в стиле Laravel
+    """
     
     def format(self, record):
         # Форматируем сообщение в стиле Laravel
@@ -20,7 +22,9 @@ class LaravelFormatter(logging.Formatter):
         return f"[{timestamp}] {record.levelname}: {record.getMessage()}"
 
 class FileFilter(logging.Filter):
-    """Фильтр для файла логов - пропускает только важные сообщения"""
+    """
+    Фильтр для файла логов - пропускает только важные сообщения
+    """
     
     def filter(self, record):
         # Пропускаем только сообщения уровня INFO и выше, исключая сообщения о подарках
@@ -28,14 +32,20 @@ class FileFilter(logging.Filter):
             message = record.getMessage()
             # Исключаем сообщения о подарках и статистику по страницам
             if not any([
-                "Processed new gift:" in message,
+                "Found new gift:" in message,
                 "Processed page" in message and "total unique gifts" in message
             ]):
                 return True
         return False
 
 def setup_logger(name: str, level: str = 'INFO', log_file: Optional[str] = None) -> logging.Logger:
-    """Настройка логгера в стиле Laravel"""
+    """
+    Настройка логгера в стиле Laravel
+    :param name: имя логгера
+    :param level: уровень логирования
+    :param log_file: путь к файлу логов
+    :return: настроенный логгер
+    """
     
     logger = logging.getLogger(name)
     logger.setLevel(getattr(logging, level.upper()))
