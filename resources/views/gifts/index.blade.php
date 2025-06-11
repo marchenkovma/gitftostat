@@ -12,7 +12,7 @@
                 <label for="name" class="block text-sm font-medium text-gray-300 mb-1">{{ __('Name') }}</label>
                 <select id="name" 
                         class="w-full rounded-lg border-gray-700 bg-gray-800 text-white focus:border-blue-500 focus:ring-blue-500"
-                        onchange="updateModels()">
+                        onchange="handleNameChange()">
                     <option value="">{{ __('Select name') }}</option>
                     @foreach($names as $name)
                         <option value="{{ $name }}" {{ request('name') == $name ? 'selected' : '' }}>{{ $name }}</option>
@@ -24,7 +24,7 @@
                 <label for="model" class="block text-sm font-medium text-gray-300 mb-1">{{ __('Model') }}</label>
                 <select id="model" 
                         class="w-full rounded-lg border-gray-700 bg-gray-800 text-white focus:border-blue-500 focus:ring-blue-500"
-                        onchange="submitForm()">
+                        onchange="handleModelChange()">
                     <option value="">{{ __('Select model') }}</option>
                 </select>
             </div>
@@ -75,26 +75,48 @@
                     modelSelect.appendChild(option);
                 });
             }
-
-            // Сохраняем выбранное имя
-            saveFilters(selectedName, modelSelect.value);
-            
-            // Если имя изменилось, сбрасываем модель
-            if (selectedName !== localStorage.getItem('giftNameFilter')) {
-                modelSelect.value = '';
-                saveFilters(selectedName, '');
-            }
-
-            // Не вызываем submitForm при начальной загрузке
-            if (!isInitialLoad) {
-                submitForm();
-            }
         }
 
-        // Функция для сохранения фильтров в localStorage
-        function saveFilters(name, model) {
-            localStorage.setItem('giftNameFilter', name);
-            localStorage.setItem('giftModelFilter', model);
+        // Обработчик изменения имени
+        function handleNameChange() {
+            const nameSelect = document.getElementById('name');
+            const selectedName = nameSelect.value;
+            
+            // Сохраняем выбранное имя
+            localStorage.setItem('giftNameFilter', selectedName);
+            
+            // Сбрасываем модель при изменении имени
+            localStorage.removeItem('giftModelFilter');
+            
+            // Обновляем список моделей
+            updateModels();
+            
+            // Применяем фильтр
+            applyFilters();
+        }
+
+        // Обработчик изменения модели
+        function handleModelChange() {
+            const modelSelect = document.getElementById('model');
+            const selectedModel = modelSelect.value;
+            
+            // Сохраняем выбранную модель
+            localStorage.setItem('giftModelFilter', selectedModel);
+            
+            // Применяем фильтр
+            applyFilters();
+        }
+
+        // Функция для применения фильтров
+        function applyFilters() {
+            const name = document.getElementById('name').value;
+            const model = document.getElementById('model').value;
+            const params = new URLSearchParams();
+            
+            if (name) params.append('name', name);
+            if (model) params.append('model', model);
+            
+            window.location.href = '{{ route('gifts.index') }}' + (params.toString() ? '?' + params.toString() : '');
         }
 
         // Функция для очистки фильтров
@@ -103,19 +125,6 @@
             localStorage.removeItem('giftNameFilter');
             localStorage.removeItem('giftModelFilter');
             window.location.href = '{{ route('gifts.index') }}';
-        }
-
-        // Функция для применения фильтров
-        function submitForm() {
-            const name = document.getElementById('name').value;
-            const model = document.getElementById('model').value;
-            const params = new URLSearchParams();
-            
-            if (name) params.append('name', name);
-            if (model) params.append('model', model);
-            
-            saveFilters(name, model);
-            window.location.href = '{{ route('gifts.index') }}' + (params.toString() ? '?' + params.toString() : '');
         }
 
         // Восстановление фильтров при загрузке страницы
@@ -131,7 +140,7 @@
             // Если есть сохраненные фильтры, но нет параметров в URL, применяем их
             if ((savedName || savedModel) && !window.location.search) {
                 isInitialLoad = false;
-                submitForm();
+                applyFilters();
             }
 
             isInitialLoad = false;
